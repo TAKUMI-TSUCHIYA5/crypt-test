@@ -1,0 +1,783 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="icon" type="image/vnd.microsoft.icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAA==">
+        <meta http-equiv="Pragma" content="no-store"><!-- キャッシュ禁止 -->
+        <meta http-equiv="Cache-Control" content="no-store"><!-- キャッシュ禁止 -->
+        <meta http-equiv="Expires" content="0"><!-- キャッシュの有効期限を0に変更 -->
+<!--
+・説明
+    このページにはAES暗号化済みコンテンツが格納されており、予め指定したパスワードを入力することでアクセスすることが可能である。
+    また、初回時の復号化に成功するとセッションストレージに暗号化済みパスワードが保存され、リロード後に自動復号化処理が行われるように設計されている。
+    ただし、自動復号化処理機能を有効化していた場合、クロスサイトスクリプティングに対しての脆弱性を持つ可能性があることに注意するべきである。
+    ※ 一部のブラウザで'favicon'が機能しない例がある
+    ※ 'document.write'関数によってAES暗号化済みコンテンツを現行のページに上書きする設計であるため、将来的に使用困難になる恐れがある
+・URLから外部記述可能なパラメータ一覧
+    以下にURLから外部記述可能なパラメータの一覧を示す。
+    ・'sdp_auto_decrypt' : 自動復号化処理の実行可否を明示的に指定する。(自動復号化処理に使用する暗号化されたパスワードをセッションストレージから取得する)
+        ・'sdp_auto_decrypt > 0'である場合は、実行する。
+        ・'sdp_auto_decrypt <= 0'である場合は、実行しない。
+        ・指定しない場合は標準設定(実行する)が適用される。
+        ※ 'sdp_auto_decrypt'を暗号化対象のページで使用していた場合、衝突が起こることに注意するべきである
+        ※ 'sdp_auto_decrypt <= 0'である場合でも復号化処理成功時、合致したパスワードがセッションストレージに格納される場合があることに注意するべきである
+    ・'sdp_leave_password' : 復号化処理成功時、自動復号化処理に使用する暗号化されたパスワードをセッションストレージに保存するか否かを指定する。
+        ・'sdp_leave_password > 0'である場合は、保存する。
+        ・'sdp_leave_password <= 0'である場合は、保存しない。
+        ・指定しない場合は標準設定(保存する)が適用される。
+        ※ 'sdp_leave_password'を暗号化対象のページで使用していた場合、衝突が起こることに注意するべきである
+    ・'sdp_clear' : 自動復号化処理に使用する暗号化された復号化処理成功時のパスワードをセッションストレージから消去する。(読み込むべきデータが失われるため、自動復号化処理は行われない)
+        ・'sdp_clear > 0'である場合は、破棄する。
+        ・'sdp_clear <= 0'である場合は、破棄しない。
+        ・指定しない場合は破棄しない。
+        ※ 'sdp_clear'を暗号化対象のページで使用していた場合、衝突が起こることに注意するべきである
+    ・'sdp_password' : 外部からパスワードを入力する。(外部からのパスワードの方が優先されるため、自動復号化処理は行われない)
+        ※ セキュリティ的に'sdp_password'の使用は非推奨
+        ※ 自己復号化ページを入れ子構造にしていたり、'sdp_password'を暗号化対象のページで使用していた場合、衝突が起こることに注意するべきである
+    ・'sdp_auto_download' : 自動ファイルダウンロード処理の実行可否を明示的に指定する。 (AES暗号化済みコンテンツがファイルの専用ダウンロードページである場合のみ有効)
+        ・'sdp_auto_download > 0'である場合は、実行する。
+        ・'sdp_auto_download <= 0'である場合は、実行しない。
+        ・指定しない場合は標準設定が適用される。
+    以下に自動復号化処理を使用しないが、セッションストレージに格納したデータを破棄せず、パスワードが合致した場合にセッションストレージへ自動復号化処理用の暗号化済みパスワードを格納するパラメータ例を示す。
+        ex. <ファイルまでのパス>?sdp_auto_decrypt=false&sdp_leave_password=true&sdp_clear=false
+-->
+<style  type="text/css">
+body#unlock_body {
+    background-color: #909090;
+    display: none;
+}
+div#unlock_board {
+    max-width: 600px;
+    width: 95%;
+    padding: 40px 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #505050;
+    text-align: center;
+}
+div#unlock_board p {
+    color: #ffffff;
+    font-weight: 250;
+    font-size: 16px;
+}
+div#unlock_board span.tips {
+    
+}
+span.tips {
+	font-size: 14px;
+}
+table#tips_table {
+    width: 80%;
+    /*table-layout: fixed;*/
+    word-break: break-all;
+    overflow-wrap: break-all;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+table#tips_table tbody tr th {
+    width: 0px;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: top;
+}
+table#tips_table tbody tr td {
+	word-break: break-all;
+    overflow-wrap: break-all;
+    text-align: left;
+    vertical-align: top;
+}
+div#unlock_board input#input_password {
+    border: 0;
+    background: #ffffff;
+    display: block;
+    margin: 20px auto;
+    border: 2px solid #a0a0a0;
+    padding: 15px 10px;
+    width: 65%;
+    outline: none;
+    border-radius: 24px;
+    transition: 0.25s;
+    text-align: center;
+    font-family: Tahoma;
+}
+div#unlock_board input#input_password:focus::placeholder  { color: transparent; }
+div#unlock_board input#input_execute {
+    border: 0;
+    background: none;
+    display: block;
+    margin: 20px auto;
+    border: 2px solid #f0f8ff;
+    padding: 15px 10px;
+    max-width: 250px;
+    width: 65%;
+    outline: none;
+    color: white;
+    border-radius: 25px;
+    transition: 0.25s;
+    text-align: center;
+    cursor: pointer;
+}
+div#unlock_board input#input_execute:hover {
+    border: 2px solid #33ffff;
+    color: #33ffff;
+}
+div#unlock_board input.active#input_execute {
+    border: 2px solid #3333ff;
+    color: #3333ff;
+}
+span.wss { display: inline-block; }
+div.warning_box {
+    color: #ff8800; 
+    display: none;
+}
+div.rooting_box {
+    color: #04c9d3; 
+    display: none;
+}
+div.warning_box.active_animation {
+    animation-name: flashing_ng;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+}
+div.rooting_box.active_animation {
+    animation-name: flashing_ok;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+}
+div.warning_box.active { display: block; }
+div.rooting_box.active { display: block; }
+div.warning_box.fade_out_message { animation: fade_out 0.25s; }
+div.rooting_box.fade_out_message { animation: fade_out 0.25s; }
+@keyframes fade_out {
+      0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes flashing_ng {
+      0% { background-color: #ff990000; }
+     20% { background-color: #ff990050; }
+    100% { background-color: #ff990000; }
+}
+@keyframes flashing_ok {
+      0% { background-color: #46b3db00; }
+     20% { background-color: #46b3db50; }
+    100% { background-color: #46b3db00; }
+}
+div.warning_box#warning_box_ue {
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+</style>
+<script type="text/javascript"><!--
+function str2ab(str) {
+    const buf = new ArrayBuffer(str.length);
+    const bufView = new Uint8Array(buf);
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+}
+
+function reverse_b642ab(binary_code) {
+    let binaryString = "";
+    const bytes = new Uint8Array(binary_code);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binaryString += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binaryString);
+}
+
+function b642ab(base64) {
+    const binary_string = window.atob(base64);
+    const len = binary_string.length;
+    let bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+--></script><script type="text/javascript"><!--
+var input_execute_button = null;
+var timer_of_button = null;
+
+function set_button() {
+    input_execute_button = document.getElementById("input_execute");
+    if (input_execute_button) {
+        input_execute_button.addEventListener("keydown", function(event) {
+            if (event.key == "Enter") {
+                if (timer_of_button) {
+                    clearTimeout(timer_of_button);
+                }
+                event.target.classList.add("active");
+                timer_of_button = setTimeout(function() {
+                    event.target.classList.remove("active");
+                    timer_of_button = null;
+                }, 150);
+            }
+        });
+        input_execute_button.addEventListener("mousedown", function(event) {
+            event.target.classList.add("active");
+        });
+        input_execute_button.addEventListener("mouseup", function(event) {
+            event.target.classList.remove("active");
+        });
+        input_execute_button.addEventListener("mouseleave", function(event) {
+            event.target.classList.remove("active");
+        });
+    }
+}
+
+function display_body() {
+    let return_flag = false;
+    const body_object = document.getElementById("unlock_body");
+    if (body_object) {
+        body_object.style.display = "block";
+        return_flag = true;
+    } else {
+        console.log("[WARNING]:", "Failed to 'display_body();'");
+    }
+}
+
+function auto_decrypt() {
+    /* 自動復号化モードの確認 */
+    const auto_decrypt_mode_object = document.getElementById("auto_decrypt_mode_box");
+    let auto_decrypt_mode = false;
+    if (auto_decrypt_mode_object && Number(auto_decrypt_mode_object.value) > 0) {
+        auto_decrypt_mode = true;
+    }
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+    /* パラメータに'sdp_auto_decrypt'があった場合は挙動を修正 */
+    if (params.has("sdp_auto_decrypt")) {
+        if (Number(params.get("sdp_auto_decrypt")) > 0) {
+            auto_decrypt_mode = true;
+        } else if (Number(params.get("sdp_auto_decrypt")) <= 0) {
+            auto_decrypt_mode = false;
+        }
+        console.log("[OUTER_CONTROL]:", "AUTO_DECRYPT_MODE", "=", auto_decrypt_mode, "(FORCE)");
+    } else {
+        console.log("[OUTER_CONTROL]:", "AUTO_DECRYPT_MODE", "=", auto_decrypt_mode, "(DEFAULT)");
+    }
+    /* パラメータに'sdp_clear'があった場合はセッションストレージを消去判定 */
+    if (params.has("sdp_clear")) {
+        if (Number(params.get("sdp_clear")) > 0) {
+            delete_session_storage();
+            console.log("[OUTER_CONTROL]:", "CLEAR_FOR_AUTO_DECRYPT", "=", true, "(FORCE)");
+        } else if (Number(params.get("sdp_clear")) <= 0) {
+            console.log("[OUTER_CONTROL]:", "CLEAR_FOR_AUTO_DECRYPT", "=", false, "(FORCE)");
+        }
+    } else {
+        console.log("[OUTER_CONTROL]:", "CLEAR_FOR_AUTO_DECRYPT", "=", false, "(DEFAULT)");
+    }
+    /* 'sdp_leave_password'があった場合は暗号化済みパスワードのセーブについて判定 */
+    const leave_password_flag_object = document.getElementById("leave_password_flag_box");
+    let leave_password_flag = true;
+    if (leave_password_flag_object) {
+        if (Number(leave_password_flag_object.value) > 0) {
+            leave_password_flag = true;
+        } else if (Number(leave_password_flag_object.value) <= 0) {
+            leave_password_flag = false;
+        } /* 標準を読み込む */
+        const exist_sdp_leave_password = params.has("sdp_leave_password");
+        if (exist_sdp_leave_password && Number(params.get("sdp_leave_password")) > 0) {
+            leave_password_flag = true;
+            leave_password_flag_object.value = "1";
+            console.log("[OUTER_CONTROL]:", "LEAVE_PASSWORD_FOR_AUTO_DECRYPT", "=", true, "(FORCE)");
+        } else if (exist_sdp_leave_password && Number(params.get("sdp_leave_password")) <= 0) {
+            leave_password_flag = false;
+            leave_password_flag_object.value = "0";
+            console.log("[OUTER_CONTROL]:", "LEAVE_PASSWORD_FOR_AUTO_DECRYPT", "=", false, "(FORCE)");
+        } else {
+            console.log("[OUTER_CONTROL]:", "LEAVE_PASSWORD_FOR_AUTO_DECRYPT", "=", leave_password_flag, "(DEFAULT)");
+        }
+    } else {
+        console.log("[WARNING]:", "Not found 'leave_password_flag_object'");
+    }
+    /* パラメータに'sdp_password'があった場合はそれをパスワード入力とみなす */
+    const parameter_password = params.get("sdp_password");
+    if (parameter_password) {
+        console.log("[OUTER_CONTROL]:", "PASSWORD_FROM_OUTER", "=", parameter_password, "(FORCE)");
+    } else {
+        console.log("[OUTER_CONTROL]:", "PASSWORD_FROM_OUTER", "=", null, "(DEFAULT)");
+    }
+    if (parameter_password) {
+        try {
+            console.log("[OUTER_EXECUTE]:", "PASSWORD", "=", parameter_password);
+            execute_decrypt(parameter_password, leave_password_flag); /* パスワードを外部入力 */
+        } catch(error) {
+            display_body();
+            /*console.log("point A3");*/
+            throw error;
+        }
+    } else if (auto_decrypt_mode) { /* 自動復号化処理に関する記述 */
+        /* セッションストレージから成功時のパスワードを抜き出し */
+        load_session_storage()
+        .then(function(val) {
+            if (val) {
+                try {
+                    console.log("[SELF_EXECUTE]:", "PASSWORD", "=", "<SECRET>");
+                    execute_decrypt(val, false); /* 成功時のデータを借用 */
+                } catch(error) {
+                    display_body();
+                    /*console.log("point B2");*/
+                    throw error;
+                }
+            } else {
+                console.log("[SELF_EXECUTE]:", "PASSWORD", "=", null);
+                display_body();
+                /*console.log("point B3");*/
+            }
+        })
+        .catch(function (error) {
+            console.log("[ERROR]:", error.name, error.message);
+            throw error;
+        });
+    } else {
+        /*console.log("[NON_EXECUTE]:", "PASSWORD", "=", null);*/
+        display_body();
+        /*console.log("point C1");*/
+    }
+}
+
+function focus_input_for_password() {
+    setTimeout(function() {
+        const password_object = document.getElementById("input_password");
+        if (password_object) {
+            password_object.focus();
+        } else {
+            console.log("[WARNING]:", "Failed to 'focus_input_for_password();'");
+        }
+    }, 1);
+}
+
+/* ロード時にボタンクリック時の挙動を定義する */
+window.addEventListener("load", function() {
+    console.log("[INFORMATION]:", "load");
+    auto_decrypt(); 
+    set_button();
+    focus_input_for_password();
+});
+
+/*組みあがった際に実行 DOMContentLoaded */
+document.addEventListener("DOMContentLoaded",function() {
+    console.log("[INFORMATION]:", "DOMContentLoaded");
+});
+
+/* セッションストレージの読み書き */
+function save_session_storage_core(data, special_code) {
+    let special_code_buffer = "";
+    if (special_code) {
+        special_code_buffer = "-" + special_code;
+    }
+    if (data) {
+        sessionStorage.setItem("password" + special_code_buffer, data);
+    }
+}
+function load_session_storage_core() {
+    const special_code_object = document.getElementById("special_code_box");
+    let special_code = "";
+    if (special_code_object) {
+        special_code = "-" + special_code_object.value;
+    } else {
+        console.log("[WARNING]:", "Not found 'special_code_box'");
+    }
+    return sessionStorage.getItem("password" + special_code);
+}
+function delete_session_storage() {
+    const special_code_object = document.getElementById("special_code_box");
+    let special_code = "";
+    if (special_code_object) {
+        special_code = "-" + special_code_object.value;
+    }
+    sessionStorage.removeItem("password" + special_code);
+}
+
+/* セッションストレージ関連のデータ保護 */
+function save_session_storage(data) {
+    /* データ取得 */
+    const special_code_object = document.getElementById("special_code_box");
+    const sub_password_object = document.getElementById("sub_password_box");
+    const sub_iv_object = document.getElementById("sub_initialization_vector_box");
+    const sub_salt_object = document.getElementById("sub_salt_box");
+    /* データ加工 */
+    const special_code = special_code_object.value;
+    const sub_password = b642ab(sub_password_object.value);
+    const sub_iv = b642ab(sub_iv_object.value);
+    const sub_salt = b642ab(sub_salt_object.value);
+    encrypt(str2ab(data), sub_password, sub_salt, sub_iv)
+    .then(function (val) {
+        save_session_storage_core(reverse_b642ab(val), special_code);
+    })
+    .catch(function (error) {
+        /*console.error(error);*/
+        throw error;
+    });
+}
+async function load_session_storage() {
+    let return_data = null;
+    const buffer = load_session_storage_core();
+    if (buffer) {
+        /* データ取得 */
+        const sub_password_object = document.getElementById("sub_password_box");
+        const sub_iv_object = document.getElementById("sub_initialization_vector_box");
+        const sub_salt_object = document.getElementById("sub_salt_box");
+        /* データ加工 */
+        const sub_password = b642ab(sub_password_object.value);
+        const sub_iv = b642ab(sub_iv_object.value);
+        const sub_salt = b642ab(sub_salt_object.value);
+        return_data = await decrypt(b642ab(buffer), sub_password, sub_salt, sub_iv);
+    }
+    return return_data;
+}
+--></script><script type="text/javascript"><!--
+async function generate_aes_key_from_password(password, salt, iterations, key_length) {
+    try {
+        const encoded_password = new TextEncoder().encode(password);
+        const crypto_key = await crypto.subtle.importKey(
+            "raw",
+            encoded_password,
+            {
+                name: "PBKDF2"
+            },
+            false,
+            ["deriveBits"]
+        );
+        const derived_bits = await crypto.subtle.deriveBits(
+              {
+                name: "PBKDF2",
+                salt: salt,
+                iterations: iterations,
+                hash: "SHA-256",
+              },
+            crypto_key,
+            key_length * 8
+        );
+        const derived_key = new Uint8Array(derived_bits);
+        return derived_key;
+    } catch (error) {
+        console.error("Error generating key:", error);
+        throw error;
+    }
+}
+
+var import_key = function(password) {
+    return window.crypto.subtle.importKey(
+        "raw",
+        str2bytes(password),
+        {
+            name: "PBKDF2",
+        },
+        false,
+        ["deriveBits"]
+    );
+};
+var get_hash_output_length = function(hash_algorithm) {
+    switch (hash_algorithm) {
+    case "SHA-1":   return 160;
+    case "SHA-256": return 256;
+    case "SHA-384": return 384;
+    case "SHA-512": return 512;
+    default:
+        break;
+    }
+    throw new Error("Unsupported hash algorithm");
+};
+var derive_bits = function(key, salt, hash_algorithm, iterations) {
+    hash_algorithm = hash_algorithm || "SHA-256";
+    return window.crypto.subtle.deriveBits(
+        {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: iterations || 1000,
+            hash: {name: hash_algorithm}, //"SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+        },
+        key,
+        get_hash_output_length(hash_algorithm)
+    );
+};
+
+/* パスワードハッシュ化 */
+var hash_password = function(password, salt) {
+    return import_key(password).then(function(key) {
+        return derive_bits(key, salt, "SHA-256", 1000);
+    }).then(function(buffer) {
+        var bytes = new Uint8Array(buffer);
+        return bytes2base64(bytes);
+    });
+};
+--></script><script type="text/javascript"><!--
+async function encrypt(plain, password, salt, iv) {
+    const key_sorce = await generate_aes_key_from_password(password, salt, 100000, 32);
+    const key = await crypto.subtle.importKey(
+        "raw",
+        key_sorce,
+        "AES-CBC",
+        true,
+        ["encrypt"]
+    );
+    const buffer = await window.crypto.subtle.encrypt(
+          {
+            name: "AES-CBC",
+            iv: iv
+        },
+        key,
+        plain
+    );
+    return buffer;
+}
+
+async function decrypt(cipher, password, salt, iv) {
+    const key_sorce = await generate_aes_key_from_password(password, salt, 100000, 32);
+    const key = await crypto.subtle.importKey(
+        "raw",
+        key_sorce,
+        "AES-CBC",
+        true,
+        ["decrypt"]
+    );
+    const buffer = await window.crypto.subtle.decrypt(
+          {
+            name: "AES-CBC",
+            iv: iv
+        },
+        key,
+        cipher
+    );
+    return new TextDecoder().decode(buffer);
+}
+
+function escape_html(string) {
+    if(typeof string !== "string") {
+        return string;
+    }
+    return string.replace(/[&'`"<>]/g, function(match) {
+        return {
+            "&"  : "&amp;",
+            "'"  : "&#x27;",
+            "`"  : "&#x60;",
+            "\"": "&quot;",
+            "<"  : "&lt;",
+            ">"  : "&gt;",
+        }[match]
+    });
+}
+
+var hide_timer = null;
+
+async function execute_decrypt(input_password, leave_password_mode) {
+    /* 暗号化済みパスワードのセーブについての判定 */
+    const leave_password_flag_object = document.getElementById("leave_password_flag_box");
+    if (leave_password_flag_object && Number(leave_password_flag_object.value) <= 0) {
+        leave_password_mode = false;
+    }
+    /* パスワード関連 */
+    let password = null;
+    const password_object = document.getElementById("input_password");
+    if (input_password) {
+        password = input_password;
+    } else {
+        password = password_object.value;
+    }
+    /* データ取得 */
+    const crypted_data_object = document.getElementById("crypted_data_box");
+    const iv_object = document.getElementById("initialization_vector_box");
+    const salt_object = document.getElementById("salt_box");
+    /* データ加工 */
+    const crypted_data = b642ab(crypted_data_object.value);
+    const iv = b642ab(iv_object.value);
+    const salt = b642ab(salt_object.value);
+    /* テスト */
+    /*console.log("[TEST]:", "DECRYPT", "password:", password, "iv:", iv, "salt:", salt);*/
+    /* 参照 */
+    const rooting_space = document.getElementById("rooting_box_s");
+    const warning_space_pw = document.getElementById("warning_box_pwe");
+    const warning_space_u = document.getElementById("warning_box_ue");
+    const warning_space_e = document.getElementById("warning_box_ee");
+    /* 分岐 */
+    if (hide_timer) {
+        clearTimeout(hide_timer);
+    }
+    if (password && password.length > 0) {
+        /* 復号化 */
+        decrypt(crypted_data, password, salt, iv)
+        .then(function (val) {
+            console.log("[INFORMATION]:", "DECRYPT", true, "(LENGHT="+val.length+")");
+            if (rooting_space) {
+                rooting_space.classList.remove("active_animation");
+                rooting_space.classList.add("active");
+                setTimeout(function() { rooting_space.classList.add("active_animation"); }, 100);
+                hide_timer = setTimeout(function() {
+                    rooting_space.classList.add("fade_out_message");
+                    setTimeout(function() {
+                        rooting_space.classList.remove("active");
+                        rooting_space.classList.remove("fade_out_message");
+                    }, 250);
+                }, 5000);
+            }
+            if (warning_space_u) {
+                warning_space_u.classList.remove("active");
+            }
+            if (warning_space_pw) {
+                warning_space_pw.classList.remove("active");
+            }
+            if (warning_space_e) {
+                warning_space_e.classList.remove("active");
+            }
+            setTimeout(function() {
+                /* HTML構造の上書き部分 */
+                try {
+                    /* 成功したパスワードを保持 */
+                    if (leave_password_mode) {
+                        save_session_storage(password);
+                        console.log("[INFORMATION]:", "EXECUTED 'save_session_storage(<password>);'");
+                    }
+                    /* HTML文字列を書き込み */
+                    /* https://developer.mozilla.org/ja/docs/Web/API/Document/write 参照 */
+                    document.open();
+                    document.write(val);
+                    document.close();
+                    console.log("[INFORMATION]:", "EXECUTED 'document.write(<SecretDocument>);'");
+                    /* オプション処理 */
+                    password_object.value = "";
+                } catch(error) {
+                    if (rooting_space) {
+                        rooting_space.classList.remove("active");
+                    }
+                    if (warning_space_u) {
+                        warning_space_u.innerHTML = "<span class=\"wss\">不明なエラー</span><br><span class=\"wss\">[" + escape_html(error.name) + "]</span> <span class=\"wss\" style=\"text-align: left;\">" + escape_html(error.message) + "</span></span>";
+                        warning_space_u.classList.remove("active_animation");
+                        warning_space_u.classList.add("active");
+                        setTimeout(function() { warning_space_u.classList.add("active_animation"); }, 100);
+                    }
+                    if (warning_space_pw) {
+                        warning_space_pw.classList.remove("active");
+                    }
+                    if (warning_space_e) {
+                        warning_space_e.classList.remove("active");
+                    }
+                    display_body();
+                    /*console.log("point W1");*/
+                    throw error;
+                }
+            }, 300);
+          })
+        .catch(function (error) {
+            console.log("[INFORMATION]:", "DECRYPT", false, "(LENGHT=null)");
+            console.log("[ERROR]:", error.name, error.message);
+            /*console.error(error);*/
+            if (error.name == "OperationError") {
+                if (rooting_space) {
+                    rooting_space.classList.remove("active");
+                }
+                if (warning_space_u) {
+                    warning_space_u.classList.remove("active");
+                }
+                if (warning_space_pw) {
+                    warning_space_pw.classList.remove("active_animation");
+                    warning_space_pw.classList.add("active");
+                    setTimeout(function() { warning_space_pw.classList.add("active_animation"); }, 100);
+                    hide_timer = setTimeout(function() {
+                        warning_space_pw.classList.add("fade_out_message");
+                        setTimeout(function() {
+                            warning_space_pw.classList.remove("active");
+                            warning_space_pw.classList.remove("fade_out_message");
+                        }, 250);
+                    }, 5000);
+                }
+                if (warning_space_e) {
+                    warning_space_e.classList.remove("active");
+                }
+            } else {
+                if (rooting_space) {
+                    rooting_space.classList.remove("active");
+                }
+                if (warning_space_u) {
+                    warning_space_u.innerHTML = "<span class=\"wss\">不明なエラー</span><br><span class=\"wss\">[" + escape_html(error.name) + "]</span> <span class=\"wss\" style=\"text-align: left;\">" + escape_html(error.message) + "</span></span>";
+                    warning_space_u.classList.remove("active_animation");
+                    warning_space_u.classList.add("active");
+                    setTimeout(function() { warning_space_u.classList.add("active_animation"); }, 100);
+                }
+                if (warning_space_pw) {
+                    warning_space_pw.classList.remove("active");
+                }
+                if (warning_space_e) {
+                    warning_space_e.classList.remove("active");
+                }
+            }
+            password_object.value = "";
+            display_body();
+            /*console.log("point W2");*/
+            throw error;
+        });
+    } else {
+        if (rooting_space) {
+            rooting_space.classList.remove("active");
+        }
+        if (warning_space_u) {
+            warning_space_pw.classList.remove("active");
+        }
+        if (warning_space_pw) {
+            warning_space_pw.classList.remove("active");
+        }
+        if (warning_space_e) {
+            warning_space_e.classList.remove("active_animation");
+            warning_space_e.classList.add("active");
+            setTimeout(function() { warning_space_e.classList.add("active_animation"); }, 100);
+            hide_timer = setTimeout(function() {
+                warning_space_e.classList.add("fade_out_message");
+                setTimeout(function() {
+                    warning_space_e.classList.remove("active");
+                    warning_space_e.classList.remove("fade_out_message");
+                }, 250);
+            }, 5000);
+        }
+        display_body();
+        /*console.log("point W3");*/
+    }
+}
+--></script>
+        <title>自己復号化ページ</title>
+    </head>
+    <body id="unlock_body">
+        <form id="unlock_form" onsubmit="return false;">
+            <!-- オプションデータ START -->
+            <input type="hidden" value="8AG3CzA44g04UGDpD/h2dTu4WeA4HMIj4lSgiMbGQMYOwYm+Jpe8n+IFzXRJtTK946OY7iv4KBk+CeVlW4DVtJaw21kTqx/hc96hW5yB1GmrKI37SkcEWMnmezf/7xurxqHRNQarYgmxFAJM2sQfj2fx+ofTVycmlgwwHa330EFummY7ihcUdzHzJAgAwoxWFI13JLEmHuDoXcnehyW/pIlXf54W3a2mxMnMpPYc/OiXMXdpn4Lb6KGy+YqCavv8kZ439tBuA6YhmlAg1SK7cZSN45uhUbJVSHz4UesH8psYM30pblqZN0pOH3cZm3VOsIjW0CtpJ0VhOX4RP48E334xporxLBdgwLu0LtyQq8Vqzlluj+UgLOH94AmTf9fAaxqyWbANc2A1MbwRgLldeGS+tXbzxjJSRNTvb2GkJ6qdke3u0i8F5wTjCjN1Xx/cXMHLyuTN+r2tKhFcMwzUTGat4kzMvpFd5QZrdF4DWzVZ+extt6eWwx1SmfQFAHsHLTzEIPZ/Pj2qd216NglSYnUeXgMgstgV+EzogFJGZWM5Qut3QCtTURy2BGqOXhqdemvmwNPLwXKeIo5z5up0Tg9y22D4Q+dGddOU1w8thKAzG4tPzDe1spcjefG7FRqw0h48RYnBCnfyY7HIRu+q5ZxFgY3sADma4Zj41//yPvxkAZ/sWZPcfZwwvhNia0e/hb5sdfygqgBg43l/OPKdv8CGDRE/vVHo4g/RaM6naHTisSSn8HUMRDGRO6HY8wiWIBz5bRC4tW3L8wDSWuhMO+GByW2nnsXnTOC0iTByzEJiSrxNB555yZdSSHjnwmNfpsPrNVoMUstaR5KfNURT2VQC1OcG9aAhRRJgVOfNqnRs318+NB3Ziay+It1+9Q+ifdMypki857avs/f7RJBGkQNA62tuYyHaavchEkX+cR06y7oV6HnqU3XmMqhoVyk4Jq2vz8IdGkcDyRBOuwISAoxrYnUX6N7xrKe3fcj+Vv1YCcYu7/YY3OJsIn0hOW19qsiULMrUS68rGPNjfL9deGTAcMTI0dssCBYvL6GUPhFnbtbUnCivxTmVQ839fNpihurcsqxLd6UUEUsAB4IT1Jdxd01y73ERPz8Qb6CejQi2BDmn4ZBhVtayy5Y2Koc7sGhhnNmpHKPx+k0/gEuTxQ==" id="crypted_data_box">
+            <input type="hidden" value="EnT9SRqEPBNf7KhHOJiDgw==" id="initialization_vector_box">
+            <input type="hidden" value="kb32NtzyJf6dqMAOavs57Q==" id="salt_box">
+            <input type="hidden" value="1" id="auto_decrypt_mode_box">
+            <input type="hidden" value="cvUdzjQHkzQMEwkY6o/dHg==" id="sub_initialization_vector_box">
+            <input type="hidden" value="yWqTkhQu1CM+b0N9iosc2w==" id="sub_salt_box">
+            <input type="hidden" value="4e6d46684e5456684e54686d4e4756694e47517a5a44646a5a5755324e7a56694d446b7759544131596a553d" id="sub_password_box">
+            <input type="hidden" value="648d81a5808ca8bd9a8a57b7a037569f" id="special_code_box">
+            <input type="hidden" value="1" id="leave_password_flag_box">
+            <!-- オプションデータ END -->
+            <div id="unlock_board" name="unlock_board">
+                <p><span class="wss">正しいパスワードを入力した上で、</span><span class="wss">「復号化」ボタンをクリックしてください。</span></p>
+                <div class="rooting_box" id="rooting_box_s"><span class="wss">パスワードが合致しました。</span><!-- ProgramCreator: 土屋 拓海 (Tsuchiya Takumi) --></div>
+                <div class="warning_box" id="warning_box_pwe"><span class="wss">パスワードが違います。</span><span class="wss">正しいパスワードを入力してください。</span></div>
+                <div class="warning_box" id="warning_box_ee"><span class="wss">パスワードが入力されていません。</span><span class="wss">パスワードを入力してください。</span></div>
+                <div class="warning_box" id="warning_box_ue"><span class="wss">不明なエラー</span></div>
+                
+                <input type="password" name="password" placeholder="復号化パスワード" id="input_password">
+                <input type="submit" 
+                       name="execute" 
+                       value="復号化" 
+                       id="input_execute" 
+                       onclick="console.log('[USER_EXECUTE]:', 'PASSWORD', '=', '<SECRET>'); execute_decrypt(null, true); return false;"
+                >
+            </div>
+        </form>
+    </body>
+</html>

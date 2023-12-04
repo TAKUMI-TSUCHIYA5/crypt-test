@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Get Original HTML</title>
+  <script>
+function app_x() {
+ fetch(location.href)
+  .then(function(response) {
+    // レスポンスヘッダーを取得
+    var headers = response.headers;
+    console.log(headers);
+
+    // 特定のヘッダーを取得
+    var contentType = response.headers.get('Content-Type');
+    console.log('Content-Type:', contentType);
+
+    // レスポンスボディを取得
+    return response.text();
+  })
+  .then(function(responseText) {
+    console.log(responseText);
+    document.getElementById('dumper').console.log(responseText);
+  })
+  .catch(function(error) {
+    console.error('Fetch error:', error);
+  });
+}
+  </script>
+</head>
+<body>
+  <!-- ここにページの本来のコンテンツが入ります -->
+  <div id="dumper">
+  	Non-fetch
+  </div>
+</body>
+</html>
